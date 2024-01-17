@@ -1,0 +1,30 @@
+{
+  "name": "hen-modern",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.0.8"
+  },
+  "dependencies": {
+    "@babel/plugin-transform-react-jsx": "^7.23.4",
+    "@babel/standalone": "^7.23.8",
+    "@codemirror/autocomplete": "^6.12.0",
+    "@codemirror/lang-javascript": "^6.2.1",
+    "@codemirror/view": "^6.23.0",
+    "@typescript/vfs": "^1.5.0",
+    "@valtown/codemirror-ts": "^2.0.0",
+    "ace-code": "^1.32.3",
+    "codemirror": "^6.0.1",
+    "thememirror": "^2.0.1",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+  <body>
+    <div id="app" class="flex items-center">
+      <div id="editor" class="bg-[#faf4ed] flex-1 min-h-[100vh]"></div>
+      <div id="result" class="flex-1 min-h-[100vh]">
+        <iframe
+          sandbox="allow-modals allow-same-origin allow-scripts"
+          frameborder="0"
+          id="sandbox"
+        >
+        </iframe>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
