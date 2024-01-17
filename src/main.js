@@ -5,9 +5,11 @@ import { javascript } from "@codemirror/lang-javascript";
 import { EditorView, keymap } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 import { transform } from "./lib/transformer";
-import {rosePineDawn} from "thememirror"
+import { rosePineDawn } from "thememirror";
 
-const defaultCode = `import React from "https://esm.sh/react";
+const defaultCode =
+  readCode() ||
+  `import React from "https://esm.sh/react";
 import {createRoot} from "https://esm.sh/react-dom/client";
 
 const root = createRoot(document.getElementById("root"))
@@ -21,6 +23,7 @@ root.render(<App/>)`;
 const debouncedCreateSource = debounce(createSourceScript, 250);
 
 init();
+
 function init() {
   let extensions = [
     rosePineDawn,
@@ -51,13 +54,10 @@ function init() {
   let editor = new EditorView({
     doc: defaultCode,
     extensions: extensions,
-    
+
     parent: document.querySelector("#editor"),
   });
-
-
 }
-
 
 function createSourceScript(innerDoc, sourceCode) {
   const rootElem = innerDoc.getElementById("root");
@@ -73,6 +73,7 @@ function createSourceScript(innerDoc, sourceCode) {
     source.type = "module";
     source.src = "data:application/javascript;base64," + btoa(validSourceCode);
     innerDoc.body.appendChild(source);
+    saveCode(sourceCode);
   } catch (err) {
     console.error(err);
   }
@@ -87,4 +88,12 @@ function debounce(fn, delay) {
       clearTimeout(id);
     }, delay);
   };
+}
+
+function readCode() {
+  return atob(window.location.hash.slice(1));
+}
+
+function saveCode(code) {
+  window.location.hash = btoa(code);
 }
