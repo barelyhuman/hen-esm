@@ -23,7 +23,6 @@
     "@codemirror/view": "^6.23.0",
     "@typescript/vfs": "^1.5.0",
     "@valtown/codemirror-ts": "^2.0.0",
-    "ace-code": "^1.32.3",
     "codemirror": "^6.0.1",
     "thememirror": "^2.0.1",
     "typescript": "^5.3.3"
