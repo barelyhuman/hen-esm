@@ -3,9 +3,23 @@ import "./index.css";
 import { indentWithTab } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView, keymap } from "@codemirror/view";
+
+import { minimalSetup } from "codemirror";
+
+import {
+  closeBracketsKeymap,
+  completionKeymap,
+} from "@codemirror/autocomplete";
+import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { foldKeymap } from "@codemirror/language";
+import { lintKeymap } from "@codemirror/lint";
+import { searchKeymap } from "@codemirror/search";
+import { highlightSpecialChars } from "@codemirror/view";
+
 import { basicSetup } from "codemirror";
-import { transform } from "./lib/transformer";
 import { rosePineDawn } from "thememirror";
+import { transform } from "./lib/transformer";
+import { toast } from "./lib/toast";
 
 const defaultCode =
   readCode() ||
@@ -27,7 +41,16 @@ init();
 function init() {
   let extensions = [
     rosePineDawn,
-    basicSetup,
+    minimalSetup,
+    history(),
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...completionKeymap,
+      ...lintKeymap,
+    ]),
     keymap.of([indentWithTab]),
     javascript({
       typescript: true,
@@ -51,12 +74,14 @@ function init() {
 
   createSourceScript(innerDoc, defaultCode);
 
-  let editor = new EditorView({
+  let view = new EditorView({
     doc: defaultCode,
     extensions: extensions,
-
+    lineNumbers: false,
     parent: document.querySelector("#editor"),
   });
+
+  initMenuBar();
 }
 
 function createSourceScript(innerDoc, sourceCode) {
@@ -71,7 +96,10 @@ function createSourceScript(innerDoc, sourceCode) {
     const source = innerDoc.createElement("script");
     source.id = "sandbox_src";
     source.type = "module";
-    source.src = "data:application/javascript;base64," + btoa(validSourceCode);
+    const blob = new Blob([validSourceCode], {
+      type: "application/javascript",
+    });
+    source.src = URL.createObjectURL(blob);
     innerDoc.body.appendChild(source);
     saveCode(sourceCode);
   } catch (err) {
@@ -96,4 +124,50 @@ function readCode() {
 
 function saveCode(code) {
   window.location.hash = btoa(code);
+}
+
+function initMenuBar() {
+  const menuBar = document.querySelector("#menu-bar");
+  const shareButton = menuBar.querySelector("#share-button");
+  shareButton.addEventListener("click", () => {
+    copyToClipboard(window.location.href);
+    toast.success("Copied");
+  });
+}
+
+function copyToClipboard(strToCopy) {
+  if (!navigator.clipboard) {
+    return fallBackCopy(strToCopy);
+  }
+  navigator.permissions
+    .query({ name: "clipboard-write" })
+    .then((result) => {
+      if (result.state == "granted" || result.state == "prompt") {
+        navigator.clipboard.writeText(strToCopy).then(
+          function () {
+            // ignore and digest
+          },
+          function () {
+            return fallBackCopy(strToCopy);
+          }
+        );
+      } else {
+        return fallBackCopy(strToCopy);
+      }
+    })
+    .catch((err) => {
+      return fallBackCopy(strToCopy);
+    });
+}
+
+function fallBackCopy(strToCopy) {
+  const el = document.createElement("textarea");
+  el.value = strToCopy;
+  el.setAttribute("readonly", "");
+  el.style.position = "absolute";
+  el.style.left = "-9999px";
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand("copy");
+  document.body.removeChild(el);
 }

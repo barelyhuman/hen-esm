@@ -1,20 +1,74 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
+    <title>Hen | ESM Playground</title>
   </head>
   <body>
-    <div id="app" class="flex items-center">
-      <div id="editor" class="bg-[#faf4ed] flex-1 min-h-[100vh]"></div>
-      <div id="result" class="flex-1 min-h-[100vh]">
-        <iframe
-          sandbox="allow-modals allow-same-origin allow-scripts"
-          frameborder="0"
-          id="sandbox"
+    <div
+      id="menu-bar"
+      class="h-10 bg-[#f4e7d8] shadow-t-sm shadow-lg shadow-r-sm shadow-b-xl overflow-hidden rounded-md fixed bottom-10 left-[50%] translate-x-[-50%] flex items-center"
+    >
+      <!-- <div
+        class="p-3 hover:cursor-pointer hover:bg-[#e9ceb0] transition-colors"
+        id="format-button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4 text-[#3c2811]"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
-        </iframe>
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M3 21v-4a4 4 0 1 1 4 4h-4" />
+          <path d="M21 3a16 16 0 0 0 -12.8 10.2" />
+          <path d="M21 3a16 16 0 0 1 -10.2 12.8" />
+          <path d="M10.6 9a9 9 0 0 1 4.4 4.4" />
+        </svg>
+      </div> -->
+      <div
+        class="p-3 hover:cursor-pointer hover:bg-[#e9ceb0] transition-colors"
+        id="share-button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="w-4 h-4 text-[#3c2811]"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+          <path d="M6 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+          <path d="M18 6m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+          <path d="M18 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+          <path d="M8.7 10.7l6.6 -3.4" />
+          <path d="M8.7 13.3l6.6 3.4" />
+        </svg>
+      </div>
+    </div>
+    <div id="app" class="bg-[#faf4ed] sm:p-1 md:p-2 lg:p-10">
+      <div class="flex items-center">
+        <div id="editor" class="flex-1 min-h-[100vh]"></div>
+        <div id="result" class="flex-1 min-h-[100vh]">
+          <iframe
+            sandbox="allow-modals allow-same-origin allow-scripts"
+            frameborder="0"
+            id="sandbox"
+          >
+          </iframe>
+        </div>
       </div>
     </div>
     <script type="module" src="/src/main.js"></script>
