@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,29 +10,6 @@
       id="menu-bar"
       class="h-10 bg-[#f4e7d8] shadow-t-sm shadow-lg shadow-r-sm shadow-b-xl overflow-hidden rounded-md fixed bottom-10 left-[50%] translate-x-[-50%] flex items-center"
     >
-      <!-- <div
-        class="p-3 hover:cursor-pointer hover:bg-[#e9ceb0] transition-colors"
-        id="format-button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-4 h-4 text-[#3c2811]"
-          width="24"
-          height="24"
-          viewBox="0 0 24 24"
-          stroke-width="2"
-          stroke="currentColor"
-          fill="none"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-          <path d="M3 21v-4a4 4 0 1 1 4 4h-4" />
-          <path d="M21 3a16 16 0 0 0 -12.8 10.2" />
-          <path d="M21 3a16 16 0 0 1 -10.2 12.8" />
-          <path d="M10.6 9a9 9 0 0 1 4.4 4.4" />
-        </svg>
-      </div> -->
       <div
         class="p-3 hover:cursor-pointer hover:bg-[#e9ceb0] transition-colors"
         id="share-button"
@@ -58,8 +35,63 @@
         </svg>
       </div>
     </div>
-    <div id="app" class="bg-[#faf4ed] sm:p-1 md:p-2 lg:p-10">
+    <div id="app" class="bg-[#faf4ed] sm:p-1 md:p-2 lg:p-10 !pl-2">
       <div class="flex items-center">
+        <div id="context-switch" class="self-start flex flex-col">
+          <button
+            id="switch-js"
+            class="p-3 hover:cursor-pointer rounded-sm hover:bg-[#e9ceb0] transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6 text-[#3c2811]"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+              <path d="M3 15h3v4.5a1.5 1.5 0 0 1 -3 0" />
+              <path
+                d="M9 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+              />
+              <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2h-1" />
+            </svg>
+          </button>
+          <button
+            id="switch-css"
+            class="p-3 hover:cursor-pointer rounded-sm hover:bg-[#e9ceb0] transition-colors"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="w-6 h-6 text-[#3c2811]"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              fill="none"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+              <path d="M5 12v-7a2 2 0 0 1 2 -2h7l5 5v4" />
+              <path d="M8 16.5a1.5 1.5 0 0 0 -3 0v3a1.5 1.5 0 0 0 3 0" />
+              <path
+                d="M11 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+              />
+              <path
+                d="M17 20.25c0 .414 .336 .75 .75 .75h1.25a1 1 0 0 0 1 -1v-1a1 1 0 0 0 -1 -1h-1a1 1 0 0 1 -1 -1v-1a1 1 0 0 1 1 -1h1.25a.75 .75 0 0 1 .75 .75"
+              />
+            </svg>
+          </button>
+        </div>
         <div id="editor" class="flex-1 min-h-[100vh]"></div>
         <div id="result" class="flex-1 min-h-[100vh]">
           <iframe

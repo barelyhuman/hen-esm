@@ -11,19 +11,15 @@ import {
   completionKeymap,
 } from "@codemirror/autocomplete";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
-import { foldKeymap } from "@codemirror/language";
 import { lintKeymap } from "@codemirror/lint";
 import { searchKeymap } from "@codemirror/search";
-import { highlightSpecialChars } from "@codemirror/view";
 
-import { basicSetup } from "codemirror";
 import { rosePineDawn } from "thememirror";
-import { transform } from "./lib/transformer";
 import { toast } from "./lib/toast";
+import { transform } from "./lib/transformer";
+import { createURLPersistanceStore, cssStore, jsStore } from "./lib/store";
 
-const defaultCode =
-  readCode() ||
-  `import React from "https://esm.sh/react";
+const defaultCode = `import React from "https://esm.sh/react";
 import {createRoot} from "https://esm.sh/react-dom/client";
 
 const root = createRoot(document.getElementById("root"))
@@ -39,6 +35,14 @@ const debouncedCreateSource = debounce(createSourceScript, 250);
 init();
 
 function init() {
+  const persistJS = createURLPersistanceStore("js");
+  const persistCSS = createURLPersistanceStore("css");
+
+  jsStore.load("jsCode", persistJS);
+  cssStore.load("cssCode", persistCSS);
+  jsStore.persist("jsCode", persistJS);
+  cssStore.persist("cssCode", persistCSS);
+
   let extensions = [
     rosePineDawn,
     minimalSetup,
@@ -62,6 +66,7 @@ function init() {
       const code = d.state.doc.text.join("\n");
       const innerDoc =
         sandbox.contentDocument || sandbox.contentWindow.document;
+      jsStore.data = code;
       debouncedCreateSource(innerDoc, code);
     }),
   ];
@@ -72,16 +77,25 @@ function init() {
   rootElem.id = "root";
   innerDoc.body.appendChild(rootElem);
 
+  const styles = innerDoc.createElement("style");
+  styles.innerHTML = `
+    body{
+      font-family: sans-serif;
+    }
+  `;
+  innerDoc.head.appendChild(styles);
+
   createSourceScript(innerDoc, defaultCode);
 
   let view = new EditorView({
-    doc: defaultCode,
+    doc: jsStore.data || defaultCode,
     extensions: extensions,
     lineNumbers: false,
     parent: document.querySelector("#editor"),
   });
 
   initMenuBar();
+  initContextSwitch();
 }
 
 function createSourceScript(innerDoc, sourceCode) {
@@ -101,7 +115,6 @@ function createSourceScript(innerDoc, sourceCode) {
     });
     source.src = URL.createObjectURL(blob);
     innerDoc.body.appendChild(source);
-    saveCode(sourceCode);
   } catch (err) {
     console.error(err);
   }
@@ -116,14 +129,6 @@ function debounce(fn, delay) {
       clearTimeout(id);
     }, delay);
   };
-}
-
-function readCode() {
-  return atob(window.location.hash.slice(1));
-}
-
-function saveCode(code) {
-  window.location.hash = btoa(code);
 }
 
 function initMenuBar() {
@@ -170,4 +175,17 @@ function fallBackCopy(strToCopy) {
   el.select();
   document.execCommand("copy");
   document.body.removeChild(el);
+}
+
+function initContextSwitch() {
+  const switcher = document.getElementById("context-switch");
+  const jsView = switcher.querySelector("#switch-js");
+  const cssView = switcher.querySelector("#switch-css");
+
+  jsView.addEventListener("click", () => {
+    showJSView();
+  });
+  cssView.addEventListener("click", () => {
+    showCSSView();
+  });
 }
