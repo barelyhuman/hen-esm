@@ -51,7 +51,6 @@ export function createURLPersistanceStore(paramName: string) {
       return result;
     },
     setItem(_, data) {
-      console.log({ paramName, data });
       const currentHash = window.location.hash.slice(1);
       const splits = currentHash.split("--");
       let added = false;
