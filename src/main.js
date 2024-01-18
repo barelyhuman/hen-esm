@@ -34,11 +34,9 @@ function App(){
 
 root.render(<App/>)`;
 
-const defaultStyles = `
-  body {
-    font-family: sans-serif;
-  }
-`;
+const defaultStyles = `body {
+  font-family: sans-serif;
+}`;
 
 const debouncedCreateSource = debounce(createSourceScript, 250);
 
