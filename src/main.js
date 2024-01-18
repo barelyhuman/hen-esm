@@ -60,6 +60,7 @@ function init() {
   createSourceScript(getSandboxDocument(), jsStore.data || defaultCode);
   createSourceStyle(getSandboxDocument(), cssStore.data || defaultStyles);
 
+  getJsSwitcher().classList.add("active");
   activeView = showJSView();
 }
 
@@ -121,15 +122,30 @@ function initMenuBar() {
   });
 }
 
+function getSwitcher() {
+  return document.getElementById("context-switch");
+}
+function getCssSwitcher() {
+  return getSwitcher().querySelector("#switch-css");
+}
+
+function getJsSwitcher() {
+  return getSwitcher().querySelector("#switch-js");
+}
+
+("#switch-css");
 function initContextSwitch() {
-  const switcher = document.getElementById("context-switch");
-  const jsView = switcher.querySelector("#switch-js");
-  const cssView = switcher.querySelector("#switch-css");
+  const jsView = getJsSwitcher();
+  const cssView = getCssSwitcher();
   jsView.addEventListener("click", () => {
     activeView = showJSView(activeView);
+    cssView.classList.remove("active");
+    jsView.classList.add("active");
   });
   cssView.addEventListener("click", () => {
     activeView = showCSSView(activeView);
+    jsView.classList.remove("active");
+    cssView.classList.add("active");
   });
 }
 

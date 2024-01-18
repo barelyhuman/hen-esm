@@ -2,14 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
-#editor .cm-editor{
-    @apply outline-none focus:outline-none;
+#editor .cm-editor {
+  @apply outline-none focus:outline-none;
 }
 
-.toast.success{
-    @apply !bg-zinc-900 !shadow-md rounded-md;
+.toast.success {
+  @apply !bg-zinc-900 !shadow-md rounded-md;
 }
 
-.toast.error{
-    @apply !bg-zinc-900 !shadow-md rounded-md;
+.toast.error {
+  @apply !bg-zinc-900 !shadow-md rounded-md;
+}
+
+#switch-css.active,
+#switch-js.active {
+  color: #575279;
 }
