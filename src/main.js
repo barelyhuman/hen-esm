@@ -2,6 +2,7 @@ import "./index.css";
 
 import { indentWithTab } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
+import { css } from "@codemirror/lang-css";
 import { EditorView, keymap } from "@codemirror/view";
 
 import { minimalSetup } from "codemirror";
@@ -18,6 +19,9 @@ import { rosePineDawn } from "thememirror";
 import { toast } from "./lib/toast";
 import { transform } from "./lib/transformer";
 import { createURLPersistanceStore, cssStore, jsStore } from "./lib/store";
+import { copyToClipboard, debounce } from "./lib/utils";
+
+let activeView;
 
 const defaultCode = `import React from "https://esm.sh/react";
 import {createRoot} from "https://esm.sh/react-dom/client";
@@ -29,6 +33,12 @@ function App(){
 }
 
 root.render(<App/>)`;
+
+const defaultStyles = `
+  body {
+    font-family: sans-serif;
+  }
+`;
 
 const debouncedCreateSource = debounce(createSourceScript, 250);
 
@@ -43,59 +53,41 @@ function init() {
   jsStore.persist("jsCode", persistJS);
   cssStore.persist("cssCode", persistCSS);
 
-  let extensions = [
-    rosePineDawn,
-    minimalSetup,
-    history(),
-    keymap.of([
-      ...closeBracketsKeymap,
-      ...defaultKeymap,
-      ...searchKeymap,
-      ...historyKeymap,
-      ...completionKeymap,
-      ...lintKeymap,
-    ]),
-    keymap.of([indentWithTab]),
-    javascript({
-      typescript: true,
-      jsx: true,
-    }),
-    EditorView.updateListener.of((d) => {
-      if (!d.docChanged) return;
-      const sandbox = document.getElementById("sandbox");
-      const code = d.state.doc.text.join("\n");
-      const innerDoc =
-        sandbox.contentDocument || sandbox.contentWindow.document;
-      jsStore.data = code;
-      debouncedCreateSource(innerDoc, code);
-    }),
-  ];
+  createRootElement();
+  initMenuBar();
+  initContextSwitch();
 
+  createSourceScript(getSandboxDocument(), jsStore.data || defaultCode);
+  createSourceStyle(getSandboxDocument(), cssStore.data || defaultStyles);
+
+  activeView = showJSView();
+}
+
+function createRootElement() {
   const sandbox = document.getElementById("sandbox");
   const innerDoc = sandbox.contentDocument || sandbox.contentWindow.document;
   const rootElem = innerDoc.createElement("div");
   rootElem.id = "root";
   innerDoc.body.appendChild(rootElem);
+}
 
-  const styles = innerDoc.createElement("style");
-  styles.innerHTML = `
-    body{
-      font-family: sans-serif;
-    }
-  `;
-  innerDoc.head.appendChild(styles);
-
-  createSourceScript(innerDoc, defaultCode);
-
-  let view = new EditorView({
-    doc: jsStore.data || defaultCode,
-    extensions: extensions,
-    lineNumbers: false,
-    parent: document.querySelector("#editor"),
-  });
-
-  initMenuBar();
-  initContextSwitch();
+function createSourceStyle(innerDoc, sourceCode) {
+  const existingSource = innerDoc.getElementById("sandbox_style");
+  if (existingSource) {
+    innerDoc.head.removeChild(existingSource);
+  }
+  try {
+    const styleLinik = innerDoc.createElement("link");
+    styleLinik.id = "sandbox_style";
+    const blob = new Blob([sourceCode], {
+      type: "text/css",
+    });
+    styleLinik.rel = "stylesheet";
+    styleLinik.href = URL.createObjectURL(blob);
+    innerDoc.head.appendChild(styleLinik);
+  } catch (err) {
+    console.error(err);
+  }
 }
 
 function createSourceScript(innerDoc, sourceCode) {
@@ -120,17 +112,6 @@ function createSourceScript(innerDoc, sourceCode) {
   }
 }
 
-function debounce(fn, delay) {
-  let id;
-  return (...args) => {
-    if (id) clearTimeout(id);
-    id = setTimeout(() => {
-      fn(...args);
-      clearTimeout(id);
-    }, delay);
-  };
-}
-
 function initMenuBar() {
   const menuBar = document.querySelector("#menu-bar");
   const shareButton = menuBar.querySelector("#share-button");
@@ -140,52 +121,95 @@ function initMenuBar() {
   });
 }
 
-function copyToClipboard(strToCopy) {
-  if (!navigator.clipboard) {
-    return fallBackCopy(strToCopy);
-  }
-  navigator.permissions
-    .query({ name: "clipboard-write" })
-    .then((result) => {
-      if (result.state == "granted" || result.state == "prompt") {
-        navigator.clipboard.writeText(strToCopy).then(
-          function () {
-            // ignore and digest
-          },
-          function () {
-            return fallBackCopy(strToCopy);
-          }
-        );
-      } else {
-        return fallBackCopy(strToCopy);
-      }
-    })
-    .catch((err) => {
-      return fallBackCopy(strToCopy);
-    });
-}
-
-function fallBackCopy(strToCopy) {
-  const el = document.createElement("textarea");
-  el.value = strToCopy;
-  el.setAttribute("readonly", "");
-  el.style.position = "absolute";
-  el.style.left = "-9999px";
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand("copy");
-  document.body.removeChild(el);
-}
-
 function initContextSwitch() {
   const switcher = document.getElementById("context-switch");
   const jsView = switcher.querySelector("#switch-js");
   const cssView = switcher.querySelector("#switch-css");
-
   jsView.addEventListener("click", () => {
-    showJSView();
+    activeView = showJSView(activeView);
   });
   cssView.addEventListener("click", () => {
-    showCSSView();
+    activeView = showCSSView(activeView);
   });
+}
+
+function showJSView(currentView) {
+  let extensions = [
+    rosePineDawn,
+    minimalSetup,
+    history(),
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...completionKeymap,
+      ...lintKeymap,
+    ]),
+    keymap.of([indentWithTab]),
+    javascript({
+      typescript: true,
+      jsx: true,
+    }),
+    EditorView.updateListener.of((d) => {
+      if (!d.docChanged) return;
+      const code = d.state.doc.text.join("\n");
+      jsStore.data = code;
+      debouncedCreateSource(getSandboxDocument(), code);
+    }),
+  ];
+
+  currentView?.destroy();
+  let view = new EditorView({
+    doc: jsStore.data || defaultCode,
+    extensions: extensions,
+    lineNumbers: false,
+    parent: document.querySelector("#editor"),
+  });
+
+  createSourceScript(getSandboxDocument(), jsStore.data || defaultCode);
+
+  return view;
+}
+
+function getSandboxDocument() {
+  const sandbox = document.getElementById("sandbox");
+  const innerDoc = sandbox.contentDocument || sandbox.contentWindow.document;
+  return innerDoc;
+}
+
+function showCSSView(currentView) {
+  let extensions = [
+    rosePineDawn,
+    minimalSetup,
+    history(),
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...completionKeymap,
+      ...lintKeymap,
+    ]),
+    keymap.of([indentWithTab]),
+    css(),
+    EditorView.updateListener.of((d) => {
+      if (!d.docChanged) return;
+      const code = d.state.doc.text.join("\n");
+      cssStore.data = code;
+      createSourceStyle(getSandboxDocument(), code);
+    }),
+  ];
+
+  currentView?.destroy();
+  let view = new EditorView({
+    doc: cssStore.data || defaultStyles,
+    extensions: extensions,
+    lineNumbers: false,
+    parent: document.querySelector("#editor"),
+  });
+
+  createSourceStyle(getSandboxDocument(), cssStore.data || defaultStyles);
+
+  return view;
 }
